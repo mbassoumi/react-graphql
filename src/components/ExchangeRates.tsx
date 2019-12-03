@@ -3,12 +3,13 @@ import {useQuery} from '@apollo/react-hooks';
 import {gql} from 'apollo-boost';
 
 const EXCHANGE_RATES = gql`
-  {
-    rates(currency: "USD") {
-      currency
-      rate
+
+    query Rates($currency: String!){
+        rates(currency: $currency) {
+            currency
+            rate
+        }
     }
-  }
 `;
 
 interface MyProps {
@@ -18,18 +19,33 @@ interface MyProps {
 
 const ExchangeRates = () => {
     // const {loading, error, data} = useQuery(EXCHANGE_RATES);
-    const {loading, error, data} = useQuery(EXCHANGE_RATES);
+    const {loading, error, data, refetch, networkStatus} = useQuery(EXCHANGE_RATES, {
+        variables: {
+            currency: 'USD'
+        },
+        skip: !'USD',
+        // pollInterval: 500,
+        notifyOnNetworkStatusChange: true
+    });
 
+    if (networkStatus === 4) return <p>Refetching ...</p>;
     if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error :(</p>;
+    if (error) return <p>Error :( {error.message}</p>;
 
-    return data.rates.map(({currency, rate}: MyProps) => (
-        <div key={currency}>
-            <p>
-                {currency}: {rate}
-            </p>
+    return (
+        <div>
+            <button onClick={() => refetch()}>Refetch</button>
+            {
+                data.rates.map(({currency, rate}: MyProps) => (
+                    <div key={currency}>
+                        <p>
+                            {currency}: {rate}
+                        </p>
+                    </div>
+                ))
+            }
         </div>
-    ));
+    )
 };
 
 export default ExchangeRates;
