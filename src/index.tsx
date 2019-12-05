@@ -5,7 +5,7 @@ import {ApolloProvider} from '@apollo/react-hooks';
 import {client} from './graphql/client';
 
 
-const Index: React.FC = () => (
+const Index = () => (
     <ApolloProvider client={client}>
         <App/>
     </ApolloProvider>

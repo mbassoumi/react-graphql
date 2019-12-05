@@ -29,6 +29,7 @@ const TodosList = () => {
     if (loading) return <p>Loading ...</p>;
     if (error) return <p>error ... {error.message}</p>;
 
+    console.log(data);
     return (
         <ul>
             {

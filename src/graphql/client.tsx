@@ -1,51 +1,20 @@
 import ApolloClient from 'apollo-boost';
 import {gql, InMemoryCache, HttpLink} from 'apollo-boost';
+import typeDefs from "./schema";
 
-const typeDefs = gql`
-    type Author {
-        id: Int!
-        firstName: String!
-        lastName: String!
-        #        """
-        #        the list of Posts by this author
-        #        """
-        #        posts: [Post]
-    }
+interface Cache {
+    readFragment: Function,
+    writeData: Function,
+}
 
+interface MutationProps {
+    cache: Cache,
+    getCacheKey: Function
+}
 
-    type Todo {
-        id: Int!
-        text: String!
-        completed: Boolean!
-    }
-
-    type Query {
-        author(id: ID) : Author,
-        todos : [Todo!]!
-    }
-
-
-    #    type Post {
-    #        id: Int!
-    #        title: String
-    #        author: Author
-    #        votes: Int
-    #    }
-    #
-    #    # the schema allows the following query:
-    #    type Query {
-    #        posts: [Post]
-    #        author(id: Int!): Author
-    #    }
-    #
-    #    # this schema allows the following mutation:
-    #    type Mutation {
-    #        upvotePost (
-    #            postId: Int!
-    #        ): Post
-    #    }
-`;
-
+interface TodoVariables {
+    id: number
+}
 
 
 const resolvers = {
@@ -55,7 +24,7 @@ const resolvers = {
                 {
                     __typename: 'Todo',
                     id: 1,
-                    text:  'Majd',
+                    text: 'Majd',
                     completed: false
                 },
                 {
@@ -64,20 +33,19 @@ const resolvers = {
                     text: 'Second Todo',
                     completed: false
                 },
-
             ];
         },
     },
     Mutation: {
-        toggleTodo: () => {
-            console.log('majd');
-            // const id = getCacheKey({__typename: 'TodoItem', id: variables.id});
-            /* const fragment = gql`#
-                 fragment completeTodo on TodoItem {
-                     completed
-                 }
-             `;*/
-            // const todo = cache.readFragment({fragment, id});
+        toggleTodo: (_root: Object, variables: TodoVariables, {cache, getCacheKey}: MutationProps) => {
+            const id = getCacheKey({__typename: 'TodoItem', id: variables.id});
+            console.log('id', id);
+            // const fragment = gql`
+            //     fragment completeTodo on TodoItem {
+            //         completed
+            //     }
+            // `;
+            // console.log('todo', todo);
             // const data = {...todo, completed: !todo.completed};
             // cache.writeData({id, data});
             return null;
